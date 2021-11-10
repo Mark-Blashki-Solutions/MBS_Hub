@@ -1,4 +1,4 @@
-import app.database as db
+from app import db
 from flask import Blueprint
 import logging
 
