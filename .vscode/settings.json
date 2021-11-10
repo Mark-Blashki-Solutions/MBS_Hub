@@ -1,0 +1,29 @@
+{
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./InvoiceGenerator/app/tests",
+    "-p",
+    "test_*.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "__pycache__": true,
+    "**/__pycache__": true,
+    ".pytest_cache": true,
+    "InvoiceGenerator/.pytest_cache": true,
+    "**/.pytest_cache": true
+  },
+  "editor.snippetSuggestions": "none"
+}

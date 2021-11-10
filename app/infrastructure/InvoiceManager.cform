@@ -1,0 +1,11 @@
+{
+   "InvoiceManager": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+         "NotificationARNs": [ "" ],
+         "Parameters": {  },
+         "TemplateURL": "",
+         "TimeoutInMinutes": ""
+      }
+   }
+}
