@@ -1,35 +1,19 @@
-from app.helpers.document_bridge import S3DocumentBridge
-from app import app
-import logging
+from app.extensions import document_bridge
+from app.models import InvoiceSchema, ClientSchema, LineItemSchema
 
-# Get logger
-logger = logging.getLogger()
-# logger.info("Database initialised.")
+# Initialise Schemas
+invoice_schema = InvoiceSchema()
+client_schema = ClientSchema()
+line_item_schema = LineItemSchema()
+
+invoices_schema = InvoiceSchema(many=True)
+clients_schema = ClientSchema(many=True)
+line_items_schema = LineItemSchema(many=True)
 
 # Wrapper decorator that keeps the DB current
-def __DbUpdate(func):
+def DbUpdate(func):
   def wrapper():
-    S3DocumentBridge.get(app.config['DB_FILE'])
+    document_bridge.get()
     func()
-    S3DocumentBridge.save(app.config['DB_FILE'])
+    document_bridge.save()
   return wrapper
-
-# Begin DB methods
-def get_next_invoice_number():
-  raise NotImplementedError()
-
-def add_invoice():
-  raise NotImplementedError()
-
-def list_clients():
-  raise NotImplementedError()
-
-@__DbUpdate
-def add_client(client):
-  raise NotImplementedError()
-
-def get_client(client_name):
-  raise NotImplementedError()
-
-def list_invoice_ids():
-  raise NotImplementedError()

@@ -1,33 +1,36 @@
-class Invoice:
-  line_items = None
-  get_total = None
-  client = None
-  ID = None
-  title = None
+from app.extensions import db, marshmallow
+
+# Models
+
+class Invoice(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  line_items = db.relationship('LineItem', backref="invoice", lazy=True)
+  client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+  title = db.Column(db.String(120), nullable=False)
   
   def __init__(self, dict):
-    vars(self).update( dict )
+    vars(self).update(dict)
   
   def __init__(
     self,
     line_items,
-    get_total,
     client,
-    invoice_number,
+    ID,
     title
   ):
+    self.ID = ID
     self.line_items = line_items
-    self.get_total = get_total
     self.client = client
-    self.ID = invoice_number
     self.title = title
 
-class Client:
-  name = None
-  business_name = None
-  abn = None
-  address_line1 = None
-  address_line2 = None
+class Client(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String(120), unique=True)
+  business_name = db.Column(db.String(120), unique=True)
+  abn = db.Column(db.String(15), unique=True)
+  address_line1 = db.Column(db.String(200))
+  address_line2 = db.Column(db.String(200))
+  invoices = db.relationship('Invoice', backref="client", lazy=True)
   
   def __init__(self, dict):
     vars(self).update( dict )
@@ -46,17 +49,46 @@ class Client:
     self.address_line1 = address_line1
     self.address_line2 = address_line2
 
-class LineItem:
-  quantity = None
-  description = None
-  total = None
-  gst = None
+class LineItem(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
+  quantity = db.Column(db.Float)
+  description = db.Column(db.String(300))
+  total = db.Column(db.Float)
+  gst = db.Column(db.Float)
   
   def __init__(self, dict):
     vars(self).update( dict )
   
-  def __init__(self, quantity, description, total, gst="Nil"):
+  def __init__(self, quantity, description, total, gst=0):
     self.quantity = quantity
     self.description = description
     self.total = total
     self.gst = gst
+
+# Schemas
+class InvoiceSchema(marshmallow.Schema):
+  class Meta:
+    fields = ("id",
+              "line_items",
+              "client_id",
+              "title")
+
+class ClientSchema(marshmallow.Schema):
+  class Meta:
+    fields = ("id",
+              "name",
+              "business_name",
+              "abn",
+              "address_line1",
+              "address_line2",
+              "invoices")
+
+class LineItemSchema(marshmallow.Schema):
+  class Meta:
+    fields = ("id",
+              "invoice_id",
+              "quantity",
+              "description",
+              "total",
+              "gst")

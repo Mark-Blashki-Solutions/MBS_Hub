@@ -9,9 +9,10 @@ flask-sqlalchemy = "*"
 flask-marshmallow = "*"
 boto3 = "*"
 marshmallow-sqlalchemy = "*"
-pytest = "*"
 
 [dev-packages]
+pytest-flask = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.9"
