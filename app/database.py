@@ -11,7 +11,7 @@ clients_schema = ClientSchema(many=True)
 line_items_schema = LineItemSchema(many=True)
 
 # Wrapper decorator that keeps the DB current
-def DbUpdate(func):
+def db_update(func):
   def wrapper():
     document_bridge.get()
     func()

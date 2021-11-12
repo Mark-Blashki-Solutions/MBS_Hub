@@ -27,6 +27,6 @@
   },
   "editor.snippetSuggestions": "none",
   "python.testing.pytestArgs": [
-    "tests"
+    "; python -m coverage run -m pytest; python -m coverage xml; python -m coverage report -m"
   ]
 }

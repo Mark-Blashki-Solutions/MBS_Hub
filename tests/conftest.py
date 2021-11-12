@@ -5,7 +5,10 @@ from app import create_app, register_extensions, dispose
 @pytest.fixture
 def app():
   # create the app with common test config
-  app = create_app("testing.settings")
+  app = create_app(settings={
+    "DB_FILE": "db.sqlite",
+    "AWS_S3_BUCKET": "InvoiceGeneratorDB"
+  })
   
   with app.app_context():
     register_extensions(app)
