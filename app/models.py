@@ -1,53 +1,58 @@
 from app.extensions import db, marshmallow
 
 # Models
+# TODO: add type checking and valdation
+
 
 class Invoice(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.String(36), primary_key=True)
   line_items = db.relationship('LineItem', backref="invoice", lazy=True)
-  client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+  client_name = db.Column(db.Integer, db.ForeignKey('client.name'))
   title = db.Column(db.String(120), nullable=False)
   
-  def __init__(self, dict):
-    vars(self).update(dict)
+  def __init__(self, dict:dict=None):
+    if(dict != None): vars(self).update(dict)
   
-  def __init__(
+  @classmethod
+  def from_params(
     self,
-    line_items,
-    client,
-    ID,
-    title
+    line_items=None,
+    client_name=None,
+    ID=None,
+    title=None
   ):
-    self.ID = ID
+    self.id = ID
     self.line_items = line_items
-    self.client = client
+    self.client_name = client_name
     self.title = title
+    return self
 
 class Client(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(120), unique=True)
+  name = db.Column(db.String(120), primary_key=True)
   business_name = db.Column(db.String(120), unique=True)
   abn = db.Column(db.String(15), unique=True)
   address_line1 = db.Column(db.String(200))
   address_line2 = db.Column(db.String(200))
   invoices = db.relationship('Invoice', backref="client", lazy=True)
   
-  def __init__(self, dict):
-    vars(self).update( dict )
+  def __init__(self, dict:dict=None):
+    if(dict != None): vars(self).update(dict)
   
-  def __init__(
+  @classmethod
+  def from_params(
     self,
-    name,
-    business_name,
-    abn,
-    address_line1,
-    address_line2
+    name=None,
+    business_name=None,
+    abn=None,
+    address_line1=None,
+    address_line2=None
   ):
     self.name = name
     self.business_name = business_name
     self.abn = abn
     self.address_line1 = address_line1
     self.address_line2 = address_line2
+    return self
 
 class LineItem(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -57,27 +62,29 @@ class LineItem(db.Model):
   total = db.Column(db.Float)
   gst = db.Column(db.Float)
   
-  def __init__(self, dict):
-    vars(self).update( dict )
+  def __init__(self, dict:dict=None):
+    if(dict != None): vars(self).update(dict)
   
-  def __init__(self, quantity, description, total, gst=0):
+  @classmethod
+  def from_params(self, quantity=None, description=None, total=None, invoice_id=None, gst=0):
     self.quantity = quantity
     self.description = description
     self.total = total
+    self.invoice_id = invoice_id
     self.gst = gst
+    return self
 
 # Schemas
 class InvoiceSchema(marshmallow.Schema):
   class Meta:
     fields = ("id",
               "line_items",
-              "client_id",
+              "client_name",
               "title")
 
 class ClientSchema(marshmallow.Schema):
   class Meta:
-    fields = ("id",
-              "name",
+    fields = ("name",
               "business_name",
               "abn",
               "address_line1",

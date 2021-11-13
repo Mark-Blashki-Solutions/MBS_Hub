@@ -1,4 +1,4 @@
 {
   "DB_FILE": "db.sqlite",
-  "AWS_S3_BUCKET": "InvoiceGeneratorDB"
+  "AWS_S3_BUCKET": "invoice-generator-test-bucket"
 }

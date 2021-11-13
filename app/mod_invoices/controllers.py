@@ -12,8 +12,9 @@ invoices = Blueprint('invoices', __name__)
 
 @invoices.route('/', methods=['GET'])
 def get_invoices():
-  invoices = Invoice.query.all()
-  return jsonify({'data': invoices_schema.dump(invoices)}), 200
+  return "", 200
+  # invoices = Invoice.query.all()
+  # return jsonify({'data': invoices_schema.dump(invoices)}), 200
 
 # @DbUpdate
 # @invoices.route('/', methods=['POST'])
