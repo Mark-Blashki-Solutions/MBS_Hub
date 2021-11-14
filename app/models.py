@@ -1,42 +1,24 @@
-from app.extensions import db, marshmallow
+from app.extensions import db
+from dataclasses import dataclass
+import json
 
 # Models
 # TODO: add type checking and valdation
 
-
-class Invoice(db.Model):
-  id = db.Column(db.String(36), primary_key=True)
-  line_items = db.relationship('LineItem', backref="invoice", lazy=True)
-  client_name = db.Column(db.Integer, db.ForeignKey('client.name'))
-  title = db.Column(db.String(120), nullable=False)
-  
-  def __init__(self, dict:dict=None):
-    if(dict != None): vars(self).update(dict)
-  
-  @classmethod
-  def from_params(
-    self,
-    line_items=None,
-    client_name=None,
-    ID=None,
-    title=None
-  ):
-    self.id = ID
-    self.line_items = line_items
-    self.client_name = client_name
-    self.title = title
-    return self
-
+@dataclass
 class Client(db.Model):
+  name : str
+  business_name : str
+  abn : str
+  address_line1 : str
+  address_line2 : str
+  
+  _tablename__ = "clients"
   name = db.Column(db.String(120), primary_key=True)
   business_name = db.Column(db.String(120), unique=True)
   abn = db.Column(db.String(15), unique=True)
   address_line1 = db.Column(db.String(200))
   address_line2 = db.Column(db.String(200))
-  invoices = db.relationship('Invoice', backref="client", lazy=True)
-  
-  def __init__(self, dict:dict=None):
-    if(dict != None): vars(self).update(dict)
   
   @classmethod
   def from_params(
@@ -52,9 +34,50 @@ class Client(db.Model):
     self.abn = abn
     self.address_line1 = address_line1
     self.address_line2 = address_line2
-    return self
 
+@dataclass
+class Invoice(db.Model):
+  id : str
+  client_name : str
+  client : Client
+  title : str
+  line_items : list
+  is_paid : bool
+  is_deleted : bool
+  
+  _tablename__ = "invoices"
+  id = db.Column(db.String(36), primary_key=True)
+  client_name = db.Column(db.String(120), db.ForeignKey('client.name'))
+  client = db.relationship('Client', backref=db.backref("invoices", lazy=True))
+  title = db.Column(db.String(120), nullable=False)
+  line_items = db.relationship('LineItem', backref=db.backref('invoices', lazy=True))
+  is_paid = db.Column(db.Boolean, default=False)
+  is_deleted = db.Column(db.Boolean, default=False)
+  
+  
+  @classmethod
+  def from_params(
+    self,
+    client=None,
+    ID=None,
+    title=None,
+    line_items=None
+  ):
+    self.id = ID
+    self.line_items = line_items
+    self.client = client
+    self.title = title
+
+@dataclass
 class LineItem(db.Model):
+  id : int
+  invoice_id : str
+  quantity : int
+  description : str
+  total : float
+  gst : float
+  
+  _tablename__ = "line_items"
   id = db.Column(db.Integer, primary_key=True)
   invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'))
   quantity = db.Column(db.Float)
@@ -62,40 +85,10 @@ class LineItem(db.Model):
   total = db.Column(db.Float)
   gst = db.Column(db.Float)
   
-  def __init__(self, dict:dict=None):
-    if(dict != None): vars(self).update(dict)
-  
   @classmethod
-  def from_params(self, quantity=None, description=None, total=None, invoice_id=None, gst=0):
+  def from_params(self, quantity=None, description=None, total=None, gst=0, invoice_id=None):
     self.quantity = quantity
     self.description = description
     self.total = total
     self.invoice_id = invoice_id
     self.gst = gst
-    return self
-
-# Schemas
-class InvoiceSchema(marshmallow.Schema):
-  class Meta:
-    fields = ("id",
-              "line_items",
-              "client_name",
-              "title")
-
-class ClientSchema(marshmallow.Schema):
-  class Meta:
-    fields = ("name",
-              "business_name",
-              "abn",
-              "address_line1",
-              "address_line2",
-              "invoices")
-
-class LineItemSchema(marshmallow.Schema):
-  class Meta:
-    fields = ("id",
-              "invoice_id",
-              "quantity",
-              "description",
-              "total",
-              "gst")

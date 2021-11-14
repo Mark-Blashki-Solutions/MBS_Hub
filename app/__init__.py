@@ -3,7 +3,7 @@ import logging
 import os
 import json
 from app.mod_invoices.controllers import invoices as invoice_controller
-from app.extensions import db, marshmallow, document_bridge
+from app.extensions import db, document_bridge
 
 # Get logger
 logger = logging.getLogger()
@@ -60,9 +60,6 @@ def register_extensions(app):
   db.app = app
   logger.debug("DB initialized.")
   
-  # Link Marshmallow
-  marshmallow.init_app(app)
-  logger.debug("Marshmallow initialized.")
   
   # Link document_bridge
   document_bridge.init_app(app)
